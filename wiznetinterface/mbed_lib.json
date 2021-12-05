@@ -1,0 +1,44 @@
+{
+    "name": "WIZNET",
+    "config": {
+        "sck": {
+            "help": "sck pin for spi connection. defaults to SPI_SCK",
+            "value": "SPI_SCK"
+        },
+        "cs": {
+            "help": "cs pin for spi connection. defaults to SPI_CS",
+            "value": "SPI_CS"
+        },
+        "miso": {
+            "help": "miso pin for spi connection. defaults to SPI_MISO",
+            "value": "SPI_MISO"
+        },
+        "mosi": {
+            "help": "mosi pin for spi connection. defaults to SPI_MOSI",
+            "value": "SPI_MOSI"
+        },
+        "rst": {
+            "help": "RESET pin for spi connection. defaults to D15",
+            "value": "SPI_RESET"
+        },
+        "debug": {
+            "help": "Enable debug logs. [true/false]",
+            "value": true
+        },
+        "interface": {
+            "help": "Set the wiznet module interface [W5500/W6100]",
+            "value": "W5500"
+        },
+        "socket-bufsize": {
+            "help": "Max socket data heap usage",
+            "value": 8192
+        },
+        "default-network": {
+            "help": "Set the default network interface",
+            "options" : [true,false],
+            "value": false
+        }
+    },
+    "target_overrides": {
+    }
+}
