@@ -23,7 +23,8 @@ byte mac[] = {
 
 EthernetClient ethClient;
 PubSubClient mqttClient(ethClient);
-const char *server = "192.168.0.4";
+const char *server = "10.0.0.254";
+IPAddress ip_nucleo(10,0,0,3);
 const int port = 1883;
 
 void subscribeReceiveIMU(char *topic, byte *payload, unsigned int length)
@@ -61,9 +62,9 @@ void setup() {
  }
 
  // start the Ethernet connection:
-  Serial.println("Initialize Ethernet with DHCP:");
-  if (Ethernet.begin(mac) == 0)
-  {
+  //Serial.println("Initialize Ethernet with DHCP:");
+  Ethernet.begin(mac, ip_nucleo);
+  /*{
     Serial.println("Failed to configure Ethernet using DHCP");
     if (Ethernet.hardwareStatus() == EthernetNoHardware)
     {
@@ -78,10 +79,10 @@ void setup() {
     {
       delay(1);
     }
-  }
+  }*/
   // print your local IP address:
-  Serial.print("My IP address: ");
-  Serial.println(Ethernet.localIP());
+  //Serial.print("My IP address: ");
+  //Serial.println(Ethernet.localIP());
 
   mqttClient.setServer(server, port);
   if (mqttClient.connect("nucleo-L432KC"))
@@ -107,7 +108,12 @@ void setup() {
 }
 
 void loop() {
-    
+  if (mqttClient.connected()==false){
+    //Serial.println("MQTT Broker connection is down");
+    if (mqttClient.connect("nucleo-L432KC")) {
+       //Serial.println("MQTT Broker Connection Restarted");
+    }
+  }
   //Serial.println("Enter PWM signal value 1100 to 1900, 1500 to stop");
   
   //while (Serial.available() == 0);
