@@ -50,6 +50,29 @@ void subscribeReceiveIMU(char *topic, byte *payload, unsigned int length)
   Serial.println("");
 }
 
+void subscribeReceivePressure(char *topic, byte *payload, unsigned int length)
+{
+  Serial.print("Topic: ");
+  Serial.println(topic);
+  char *cmd = new char[length + 1];
+
+  Serial.print("Message: ");
+  memcpy((void *)cmd, payload, length);
+
+  /*for (int i = 0; i < length; i++)
+  {
+    cmd[i] = ((char *)payload)[i];
+  }*/
+  cmd[length] = '\0';
+
+    Serial.print(cmd);
+  
+ 
+
+  //newline
+  Serial.println("");
+}
+
 void setup() {
   
  Serial.begin(9600);
@@ -90,9 +113,11 @@ void setup() {
     Serial.println("Connection has been established, well done");
 
     mqttClient.setCallback(subscribeReceiveIMU);
+    mqttClient.setCallback(subscribeReceivePressure);
 
     //subscribe to a specific topic in order to receive those messages
     mqttClient.subscribe("imu");
+    mqttClient.subscribe("pressure");
   }
   else
   {
