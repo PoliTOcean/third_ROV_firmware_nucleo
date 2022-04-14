@@ -19,7 +19,7 @@ int salitaA0 = 0;
 
 // Enter a MAC address for your controller below.
 byte mac[] = {
-    0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x30};
+    0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x04};
 
 EthernetClient ethClient;
 PubSubClient mqttClient(ethClient);
