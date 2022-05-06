@@ -3,9 +3,11 @@
 #include <Servo.h>
 #include <PubSubClient.h>
 
-//byte servoPin[7] = {A0, A2, D10, A4, A3, D9, D6};
+//A0 -> esc3
 
-//byte servoPinA7 = PA2;
+byte servoPin[7] = {A0, A2, D10, A4, A3, D9, D6};
+
+byte servoPinA7 = PA2;
 
 Servo servoA7;
 Servo servo[7];
@@ -27,7 +29,29 @@ const char *server = "10.0.0.254";
 IPAddress ip_nucleo(10,0,0,3);
 const int port = 1883;
 
-void subscribeReceiveIMU(char *topic, byte *payload, unsigned int length)
+void subscribeReceiveMotor(char *topic, byte *payload, unsigned int length)
+{
+  Serial.print("Topic: ");
+  Serial.println(topic);
+  char *cmd = new char[length + 1];
+
+  Serial.print("Message: ");
+  memcpy((void *)cmd, payload, length);
+
+  for (int i = 0; i < length; i++)
+  {
+    cmd[i] = ((char *)payload)[i];
+  }
+  cmd[length] = '\0';
+ 
+  Serial.print(cmd);
+  servoA7.writeMicroseconds(String(cmd).toInt());
+  
+  //newline
+  Serial.println("");
+}
+
+/*void subscribeReceivePressure(char *topic, byte *payload, unsigned int length)
 {
   Serial.print("Topic: ");
   Serial.println(topic);
@@ -39,7 +63,7 @@ void subscribeReceiveIMU(char *topic, byte *payload, unsigned int length)
   /*for (int i = 0; i < length; i++)
   {
     cmd[i] = ((char *)payload)[i];
-  }*/
+  }
   cmd[length] = '\0';
 
     Serial.print(cmd);
@@ -48,30 +72,7 @@ void subscribeReceiveIMU(char *topic, byte *payload, unsigned int length)
 
   //newline
   Serial.println("");
-}
-
-void subscribeReceivePressure(char *topic, byte *payload, unsigned int length)
-{
-  Serial.print("Topic: ");
-  Serial.println(topic);
-  char *cmd = new char[length + 1];
-
-  Serial.print("Message: ");
-  memcpy((void *)cmd, payload, length);
-
-  /*for (int i = 0; i < length; i++)
-  {
-    cmd[i] = ((char *)payload)[i];
-  }*/
-  cmd[length] = '\0';
-
-    Serial.print(cmd);
-  
- 
-
-  //newline
-  Serial.println("");
-}
+}*/
 
 void setup() {
   
@@ -80,15 +81,15 @@ void setup() {
   Ethernet.init(D3); // SCSn pin
 
  for(int n= 0; n<7; n++){
-//  servo[n].attach(servoPin[n]);
- // servo[n].writeMicroseconds(1500); // send "stop" signal to ESC.
+servo[n].attach(servoPin[n]);
+ servo[n].writeMicroseconds(1500); // send "stop" signal to ESC.
  }
 
- // start the Ethernet connection:
-  //Serial.println("Initialize Ethernet with DHCP:");
+   //start the Ethernet connection:
+  Serial.println("Initialize Ethernet");
   Ethernet.begin(mac, ip_nucleo);
   /*{
-    Serial.println("Failed to configure Ethernet using DHCP");
+    Serial.println("Failed to configure Ethernet using DHCP");*/
     if (Ethernet.hardwareStatus() == EthernetNoHardware)
     {
       Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
@@ -97,13 +98,9 @@ void setup() {
     {
       Serial.println("Ethernet cable is not connected.");
     }
-    // no point in carrying on, so do nothing forevermore:
-    while (true)
-    {
-      delay(1);
-    }
-  }*/
-  // print your local IP address:
+    
+  
+  //print your local IP address:
   //Serial.print("My IP address: ");
   //Serial.println(Ethernet.localIP());
 
@@ -112,20 +109,20 @@ void setup() {
   {
     Serial.println("Connection has been established, well done");
 
-    mqttClient.setCallback(subscribeReceiveIMU);
-    mqttClient.setCallback(subscribeReceivePressure);
+    mqttClient.setCallback(subscribeReceiveMotor);
+    //mqttClient.setCallback(subscribeReceivePressure);
 
     //subscribe to a specific topic in order to receive those messages
-    mqttClient.subscribe("imu");
-    mqttClient.subscribe("pressure");
+    mqttClient.subscribe("motor");
+    //mqttClient.subscribe("pressure");
   }
   else
   {
     Serial.println("Looks like the server connection failed...");
   }
 
- //servoA7.attach(servoPinA7);
- //servoA7.writeMicroseconds(1500);
+ servoA7.attach(servoPinA7);
+ servoA7.writeMicroseconds(1500);
  
 
 
@@ -144,36 +141,41 @@ void loop() {
   //while (Serial.available() == 0);
   
   //Serial.parseInt(); 
-  mqttClient.loop();
+  //mqttClient.loop();
   
   for(int n=0; n<7; n++){
-    setPWM_Motor(servo[n], val[n], i);
+    //servo[n].writeMicroseconds(1600);
+    //setPWM_Motor(servo[n], val[n], i);
   }
-  setPWM_Motor(servoA7, valA7, i);
-  delay(30);
+  //setPWM_Motor(servoA7, valA7, i);
+  //delay(30);
+  mqttClient.loop();
+  delay(2000);
 }
 
 
 int setPWM_Motor(Servo servo, int val, int i){
-  /*
+  
   if(i==1){
     
     val = 1100;
   }
   if(i>1 && val <= 1900 && salita == 1){
     val +=5;  
+    servo.writeMicroseconds(val);
     if(val >= 1900){
       salita = 0;
     }
   }
   else if(val >= 1100 && i>1 && salita ==0){
     val -=5;  
+    servo.writeMicroseconds(val);
     if(val <= 1100){
       salita = 1;
     }
   }
   
-  */
+  
   
   
   if(val < 1100 || val > 1900)
