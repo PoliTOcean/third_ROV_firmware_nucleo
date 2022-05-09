@@ -86,15 +86,29 @@ void subscribeReceiveMotor(char *topic, byte *payload, unsigned int length)
     Serial.println("Parsing input failed!");
     return;
   }
-  Serial.println((float)myObject["X"]);
-  u[0] = (float)myObject["X"];
-  u[1] = (float)myObject["Y"];
-  u[2] += (float)myObject["Z_UP"];
-  u[2] -= (float)myObject["Z_DOWN"];
-  u[3] = (float)myObject["ROLL"];
-  u[4] = (float)myObject["PITCH"];
-  u[5] = (float)myObject["YAW"];
- 
+  //Serial.println((float)myObject["X"]);
+  if(myObject.hasOwnProperty("X"){
+    u[0] = (float)myObject["X"];
+  }
+  if(myObject.hasOwnProperty("Y"){
+    u[1] = (float)myObject["Y"];
+  }
+  if(myObject.hasOwnProperty("Z_UP"){
+   u[2] += (float)myObject["Z_UP"]; 
+  }
+  if(myObject.hasOwnProperty("Z_DOWN"){
+    u[2] -= (float)myObject["Z_DOWN"];
+  }
+  if(myObject.hasOwnProperty("ROLL"){
+    u[3] = (float)myObject["ROLL"];
+  }
+  if(myObject.hasOwnProperty("PITCH"){
+    u[4] = (float)myObject["PITCH"];
+  }
+  if(myObject.hasOwnProperty("YAW"){
+    u[5] = (float)myObject["YAW"];
+  }
+   
   Serial.print(cmd);
   servoA7.writeMicroseconds(String(cmd).toInt());
   
